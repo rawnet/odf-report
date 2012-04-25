@@ -9,10 +9,13 @@ module ODFReport
       raise "Template [#{template}] not found." unless ::File.exists? template
 
       @template = template
-      @tmp_dir = ::File.join(Dir.tmpdir, random_filename(:prefix=>'odt_'))
+      @extension = @template.to_s.slice(-3..-1)
+      raise "Invalid template type [#{@extension}] not found." unless ['odt', 'odp'].include? @extension
+      @tmp_dir = ::File.join(Dir.tmpdir, random_filename(:prefix=>"#{@extension}_"))
       Dir.mkdir(@tmp_dir) unless ::File.exists? @tmp_dir
+      @last_entry = nil
     end
-
+    
     def create(dest)
       if dest
         FileUtils.cp(@template, dest)
@@ -40,28 +43,35 @@ module ODFReport
     private
 
     def update_content_file(content_file, &block)
-
       Zip::ZipFile.open(@path) do |z|
+        tmp_file_path = "#{@tmp_dir}/#{content_file}"
 
-        cont = "#{@tmp_dir}/#{content_file}"
-
-        z.extract(content_file, cont)
+        # This nastiness allows us to handle multiple slide images :-(
+        if z.find_entry(content_file).nil?
+          z.extract(@last_entry, tmp_file_path)
+        else
+          z.extract(content_file, tmp_file_path)
+        end
 
         txt = ''
 
-        ::File.open(cont, "r") do |f|
+        ::File.open(tmp_file_path, "r") do |f|
           txt = f.read
         end
 
         yield(txt)
 
-        ::File.open(cont, "w") do |f|
+        ::File.open(tmp_file_path, "w") do |f|
            f.write(txt)
         end
-
-        z.replace(content_file, cont)
+        
+        if z.find_entry(content_file).nil?
+          z.add(content_file, tmp_file_path)
+        else
+          z.replace(content_file, tmp_file_path)
+        end
       end
-
+      @last_entry = content_file
     end
 
     def random_filename(opts={})
