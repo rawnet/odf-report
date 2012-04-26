@@ -52,6 +52,7 @@ class Report
     slide = Slide.new(opts)
     @slides << slide
     add_field("TITLE#{@slides.length}", title)
+    add_field("DESCRIPTION#{@slides.length}", description)
     add_image("image#{@slides.length}", image_path)
   end
 

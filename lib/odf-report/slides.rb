@@ -14,6 +14,7 @@ module ODFReport
         node_txt.gsub!("draw:name=\"page1\"", "draw:name=\"page#{i+2}\"")
         node_txt.gsub!("draw:page-number=\"1\"", "draw:page-number=\"#{i+2}\"")
         node_txt.gsub!("[TITLE1]", "[TITLE#{i+2}]")
+        node_txt.gsub!("[DESCRIPTION1]", "[DESCRIPTION#{i+2}]")
         node_txt.gsub!("image1", "image#{i+2}")
         node_txt.gsub!(image_href, "Pictures/image#{i+2}#{::File.extname(s.image_path)}")
         
