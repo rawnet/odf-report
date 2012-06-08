@@ -86,7 +86,7 @@ and considering you have a table like this in your template
   i don't know... just thought I'd mention it ;-)
 </pre>
 
-and a collection @list_of_itens, it will be created one row for each item in the collection, and the replacement will take place accordingly.
+and a collection @list_of_items, it will be created one row for each item in the collection, and the replacement will take place accordingly.
 
 Any format applied to the fields in the template will be preserved.
 

@@ -11,7 +11,7 @@ class Report
     
     @fields = []
     @tables = []
-    @images = {}
+    @images = []
     @image_names_replacements = {}
     @sections = []
     @slides = []
@@ -21,10 +21,8 @@ class Report
   end
   
   def add_field(field_tag, value='', &block)
-    opts = {:name => field_tag, :value => value}
-    field = Field.new(opts, &block)
+    field = Field.new({:name => field_tag, :value => value}, &block)
     @fields << field
-
   end
 
   def add_table(table_name, collection, opts={}, &block)
@@ -44,12 +42,12 @@ class Report
   end
 
   def add_image(name, path)
-    @images[name] = path
+    image = Image.new({:name => name, :path => path})
+    @images << image
   end
 
   def add_slide(title, description, image_path)
-    opts= {:title => title, :description => description, :image_path => image_path}
-    slide = Slide.new(opts)
+    slide = Slide.new({:title => title, :description => description, :image_path => image_path})
     @slides << slide
     add_field("TITLE#{@slides.length}", title)
     add_field("DESCRIPTION#{@slides.length}", description)
@@ -61,21 +59,18 @@ class Report
     @file.create(dest)
 
     @file.update('content.xml', 'styles.xml') do |txt|
-
       parse_document(txt) do |doc|
         extend_slides!(doc)
         
         replace_fields!(doc)
         replace_sections!(doc)
         replace_tables!(doc)
-
-        find_image_name_matches(doc)
-
+        replace_images!(doc)
       end
 
     end
     
-    replace_images(@file)
+    replace_image_files(@file, @image_names_replacements)
 
     @file.path
 
@@ -106,6 +101,16 @@ private
   def replace_sections!(content)
     @sections.each do |section|
       section.replace!(content)
+    end
+  end
+  
+  def replace_images!(content)
+    @images.each do |image|
+      name = image.replace!(content)
+      unless name.nil?
+        # Add to collection which stores actual file path and name for use in Manifest
+        @image_names_replacements[name] = image.path
+      end
     end
   end
 

@@ -3,31 +3,27 @@ module ODFReport
   module Images
 
     IMAGE_DIR_NAME = "Pictures"
-
-    def find_image_name_matches(content)
-      @images.each_pair do |image_name, path|
-        if node = content.xpath("//draw:frame[@draw:name='#{image_name}']/draw:image").first
-          placeholder_path = node.attribute('href').value
-          @image_names_replacements[path] = ::File.join(IMAGE_DIR_NAME, ::File.basename(placeholder_path))
-        end
-      end
-
-    end
-
-    def replace_images(file)
-
-      return if @images.empty?
-      FileUtils.mkdir(::File.join(file.tmp_dir, IMAGE_DIR_NAME))
-      @image_names_replacements.each_pair do |path, template_image|
-        file.update(template_image) do |content|
+    
+    # Add new image files and update manifest
+    def replace_image_files(file, collection)
+      FileUtils.mkpath(::File.join(file.tmp_dir, Images::IMAGE_DIR_NAME))
+            
+      collection.each do |name, path|
+        file.update(name) do |content|
           content.replace ::File.read(path)
         end
-
       end
-
-    end # replace_images
-
-
+      file.update('META-INF/manifest.xml') do |manifest_file|
+        txt = Nokogiri::XML(manifest_file)
+        manifest_node = txt.xpath('manifest:manifest').first()
+        collection.each do |name, _|
+          file_text = '<manifest:file-entry manifest:full-path="' << name << '"/>'
+          manifest_node.add_child file_text
+        end
+        manifest_file.replace txt.to_s
+      end
+    end
+      
   end
 
 end

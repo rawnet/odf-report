@@ -45,16 +45,21 @@ module ODFReport
     def update_content_file(content_file, &block)
       Zip::ZipFile.open(@path) do |z|
         tmp_file_path = "#{@tmp_dir}/#{content_file}"
-
-        # This nastiness allows us to handle multiple slide images :-(
+        
+        # create new file if necessary, or open existing
         if z.find_entry(content_file).nil?
-          z.extract(@last_entry, tmp_file_path)
-        else
+          ::File.open(tmp_file_path, 'w') {}
+        else          
+          # In case content_file contains a directory, make sure it exists
+          FileUtils.mkpath(tmp_file_path)
+          Dir.rmdir tmp_file_path
+          
           z.extract(content_file, tmp_file_path)
         end
 
         txt = ''
 
+        # read then wait for input
         ::File.open(tmp_file_path, "r") do |f|
           txt = f.read
         end
@@ -71,7 +76,6 @@ module ODFReport
           z.replace(content_file, tmp_file_path)
         end
       end
-      @last_entry = content_file
     end
 
     def random_filename(opts={})
