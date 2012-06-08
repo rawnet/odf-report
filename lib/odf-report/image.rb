@@ -2,8 +2,6 @@ module ODFReport
 
 class Image
   
-  IMAGE_DIR_NAME = "Pictures"
-  
   attr_accessor :name, :path
   
   def initialize(opts)
@@ -11,18 +9,17 @@ class Image
     @path = opts[:path]
   end
   
-  def replace!(doc, file)
-    FileUtils.mkpath(::File.join(file.tmp_dir, IMAGE_DIR_NAME))
+  def replace!(doc)
     txt = doc.inner_html
     
     if node = doc.xpath("//draw:frame[@draw:name='#@name']/draw:image").first
       image_href = node.attribute('href').value
-      new_image_href = ::File.join(IMAGE_DIR_NAME, "#{::File.basename(@name)}#{::File.extname(@path)}")
+      new_image_href = ::File.join(Images::IMAGE_DIR_NAME, ::File.basename(path))
+      
       txt.gsub!(image_href, new_image_href)
-      file.update(new_image_href) do |content|
-        content.replace ::File.read(@path)
-      end
+      doc.inner_html = txt
     end
+    new_image_href
   end
   
 end

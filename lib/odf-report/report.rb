@@ -1,7 +1,7 @@
 module ODFReport
 
 class Report
-  include Fields, Slides
+  include Fields, Images, Slides
 
   attr_accessor :fields, :tables, :images, :sections, :file, :slides
 
@@ -69,15 +69,12 @@ class Report
         replace_fields!(doc)
         replace_sections!(doc)
         replace_tables!(doc)
-
         replace_images!(doc)
-        #find_image_name_matches(doc)
-
       end
 
     end
     
-    #replace_images!(@file)
+    replace_images(@file, @image_names_replacements)
 
     @file.path
 
@@ -113,7 +110,10 @@ private
   
   def replace_images!(content)
     @images.each do |image|
-      image.replace!(content, @file)
+      name = image.replace!(content)
+      unless name.nil?
+        @image_names_replacements[name] = image.path
+      end
     end
   end
 
