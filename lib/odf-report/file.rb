@@ -46,9 +46,14 @@ module ODFReport
       Zip::ZipFile.open(@path) do |z|
         tmp_file_path = "#{@tmp_dir}/#{content_file}"
 
+        puts content_file
         # This nastiness allows us to handle multiple slide images :-(
         if z.find_entry(content_file).nil?
-          z.extract(@last_entry, tmp_file_path)
+          if @last_entry
+            z.extract(@last_entry, tmp_file_path)
+          else
+            ::File.open(tmp_file_path, 'w') {}
+          end
         else
           z.extract(content_file, tmp_file_path)
         end

@@ -3,6 +3,7 @@ require 'zip/zipfilesystem'
 require 'fileutils'
 require 'nokogiri'
 
+require File.expand_path('../odf-report/image',    __FILE__)
 require File.expand_path('../odf-report/images',    __FILE__)
 require File.expand_path('../odf-report/field',     __FILE__)
 require File.expand_path('../odf-report/file',      __FILE__)
