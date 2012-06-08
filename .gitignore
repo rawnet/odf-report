@@ -1,4 +1,5 @@
 pkg
 doc
 *.gem
-test/result/*.odt
+test/result/
+.DS_Store
