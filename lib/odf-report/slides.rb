@@ -11,15 +11,18 @@ module ODFReport
       image_href = slide_node.xpath('//draw:image').attr("href").value
       @slides.slice(1..-1).each_with_index do |s, i|
         node_txt = slide_template
-        node_txt.gsub!("draw:name=\"page1\"", "draw:name=\"page#{i+2}\"")
-        node_txt.gsub!("draw:page-number=\"1\"", "draw:page-number=\"#{i+2}\"")
-        node_txt.gsub!("[TITLE1]", "[TITLE#{i+2}]")
-        node_txt.gsub!("[DESCRIPTION1]", "[DESCRIPTION#{i+2}]")
-        node_txt.gsub!("image1", "image#{i+2}")
+        node_txt.gsub!("draw:name=\"page#{i+1}\"", "draw:name=\"page#{i+2}\"")
+        node_txt.gsub!("draw:page-number=\"#{i+1}\"", "draw:page-number=\"#{i+2}\"")
+        node_txt.gsub!("[TITLE#{i+1}]", "[TITLE#{i+2}]")
+        node_txt.gsub!("[DESCRIPTION#{i+1}]", "[DESCRIPTION#{i+2}]")
+        node_txt.gsub!("image#{i+1}", "image#{i+2}")
         node_txt.gsub!(image_href, "Pictures/image#{i+2}#{::File.extname(s.image_path)}")
-        
         slide_node.add_next_sibling(node_txt)
+        
+        # update slide_node so slides are added in correct order
+        slide_node = _node.xpath('//draw:page').last()
       end
+      slide_node
     end
     
   end
