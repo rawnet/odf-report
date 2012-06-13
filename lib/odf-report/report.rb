@@ -41,17 +41,18 @@ class Report
     yield(sec)
   end
 
-  def add_image(name, path)
-    image = Image.new({:name => name, :path => path})
+  def add_image(name, path, opts={})
+    opts.merge!(:name => name, :path => path)
+    image = Image.new(opts)
     @images << image
   end
 
-  def add_slide(title, description, image_path)
+  def add_slide(title, description, image_path, image_options = {})
     slide = Slide.new({:title => title, :description => description, :image_path => image_path})
     @slides << slide
     add_field("TITLE#{@slides.length}", title)
     add_field("DESCRIPTION#{@slides.length}", description)
-    add_image("image#{@slides.length}", image_path)
+    add_image("image#{@slides.length}", image_path, image_options)
   end
 
   def generate(dest = nil)
