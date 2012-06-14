@@ -13,7 +13,7 @@ class Image
   
   def ratio
     if @width.nil? || @height.nil?
-      return 1
+      return nil
     end
     
     @width.to_f / @height.to_f
@@ -33,15 +33,24 @@ class Image
   private
   
   def adjust_image_dimensions(node)
-    unless ratio == 1    
+    unless ratio.nil?
       image_width = node['width']
       image_height = node['height']
-      if ratio > 1
-        adjusted_height = (parse_svg_dimension(image_height) * (1 / ratio)).round(3)
+      existing_ratio = image_width.to_f / image_height.to_f
+      image_x = node['x']
+      if ratio > existing_ratio
+        adjusted_height = (parse_svg_dimension(image_width) * (1 / ratio)).round(3)
         node['svg:height'] = "#{adjusted_height}cm"
+        puts "height = #{adjusted_height}"
       else
-        adjusted_width = (parse_svg_dimension(image_width) * ratio).round(3)
+        adjusted_width = (parse_svg_dimension(image_height) * ratio).round(3)
+        
+        total_width = parse_svg_dimension(image_width) + (parse_svg_dimension(image_x) * 2)
+        new_x = (total_width - adjusted_width) / 2
+        
         node['svg:width'] = "#{adjusted_width}cm"
+        node['svg:x'] = "#{new_x}cm"
+        puts "width = #{adjusted_width}"
       end
     end
   end
