@@ -24,6 +24,10 @@ class Field
   def get_value(data_item = nil)
     @value || @block.call(data_item) || ''
   end
+  
+  def get_key()
+    @data_field || ''
+  end
 
   def to_placeholder
     if DELIMITERS.is_a?(Array)

@@ -2,8 +2,8 @@ module ODFReport
 
   module Nested
 
-    def replace_fields!(new_section, data_item)
-      field_replace!(new_section, data_item)
+    def replace_fields!(new_section, data_item, heading = false)
+      field_replace!(new_section, data_item, heading)
     end
 
     def get_collection_from_item(item, collection_field)

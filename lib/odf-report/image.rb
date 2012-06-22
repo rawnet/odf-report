@@ -41,7 +41,6 @@ class Image
       if ratio > existing_ratio
         adjusted_height = (parse_svg_dimension(image_width) * (1 / ratio)).round(3)
         node['svg:height'] = "#{adjusted_height}cm"
-        puts "height = #{adjusted_height}"
       else
         adjusted_width = (parse_svg_dimension(image_height) * ratio).round(3)
         
@@ -50,7 +49,6 @@ class Image
         
         node['svg:width'] = "#{adjusted_width}cm"
         node['svg:x'] = "#{new_x}cm"
-        puts "width = #{adjusted_width}"
       end
     end
   end

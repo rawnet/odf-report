@@ -17,13 +17,13 @@ class Table
     @template_rows = []
     @header           = opts[:header] || false
     @skip_if_empty    = opts[:skip_if_empty] || false
+    @add_header       = opts[:add_header] || false
   end
 
   def add_column(name, data_field=nil, &block)
     opts = {:name => name, :data_field => data_field}
     field = Field.new(opts, &block)
     @fields << field
-
   end
 
   def add_table(table_name, collection_field, opts={}, &block)
@@ -48,21 +48,28 @@ class Table
       table.remove
       return
     end
-
+        
     @template_rows = table.xpath("table:table-row")
-
-    @collection.each do |data_item|
-
+    
+    @collection.each_with_index do |data_item, i|
+      remove_unused_columns table, data_item
+      
+      if @add_header && i == 0
+        # add header
+        new_node = get_next_row
+        replace_fields!(new_node, data_item, true)
+        table.add_child(new_node)
+      end
+      
       new_node = get_next_row
-
+      
       replace_fields!(new_node, data_item)
-
+      
       @tables.each do |t|
         t.replace!(new_node, data_item)
       end
 
       table.add_child(new_node)
-
     end
 
     @template_rows.each_with_index do |r, i|
@@ -98,11 +105,28 @@ private
   end
 
   def find_table_node(doc)
-
-    tables = doc.xpath(".//table:table[@table:name='#{@name}']")
-
+    tables = doc.xpath("//draw:frame[@draw:name='#@name']/table:table")
     tables.empty? ? nil : tables.first
-
+  end
+  
+  def remove_unused_columns(table, data_item)
+    columns_total = data_item.keys.size
+    
+    columns = table.xpath("table:table-column")
+    columns.each_with_index do |col, k|
+      if k >= columns_total
+        col.remove
+      end
+    end
+    
+    @template_rows.each do |r|
+      cells = r.xpath("table:table-cell")
+      cells.each_with_index do |cell, j|
+        if j >= columns_total
+          cell.remove
+        end
+      end
+    end
   end
 
 end

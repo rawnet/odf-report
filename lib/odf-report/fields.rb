@@ -2,12 +2,13 @@ module ODFReport
 
   module Fields
 
-    def field_replace!(_node, data_item = nil)
-
+    def field_replace!(_node, data_item = nil, heading = false)
+      
       txt = _node.inner_html
 
       @fields.each do |f|
-        val = f.get_value(data_item)
+        val = heading ? f.get_key : f.get_value(data_item)
+        
         txt.gsub!(f.to_placeholder, sanitize(val))
       end
 

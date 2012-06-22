@@ -47,12 +47,24 @@ class Report
     @images << image
   end
 
-  def add_slide(title, description, image_path, image_options = {})
+  def add_slide_with_image(title, description, image_path, image_options = {})
     slide = Slide.new({:title => title, :description => description, :image_path => image_path})
     @slides << slide
     add_field("TITLE#{@slides.length}", title)
     add_field("DESCRIPTION#{@slides.length}", description)
     add_image("image#{@slides.length}", image_path, image_options)
+  end
+  
+  def add_slide_with_table(title, description, table_data)
+    slide = Slide.new({:title => title, :description => description})
+    @slides << slide
+    add_field("TITLE#{@slides.length}", title)
+    add_field("DESCRIPTION#{@slides.length}", description)
+    add_table("TABLE#{@slides.length}", table_data, :add_header => true) do |t|
+      table_data.first.keys.each_with_index do |key, index|
+        t.add_column("field#{index}", key)
+      end
+    end
   end
 
   def generate(dest = nil)
