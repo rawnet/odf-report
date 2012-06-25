@@ -48,7 +48,7 @@ class Report
   end
 
   def add_slide_with_image(title, description, image_path, image_options = {})
-    slide = Slide.new({:title => title, :description => description, :image_path => image_path})
+    slide = Slide.new({:title => title, :description => description, :image_path => image_path, :slide_type => :image})
     @slides << slide
     add_field("TITLE#{@slides.length}", title)
     add_field("DESCRIPTION#{@slides.length}", description)
@@ -56,7 +56,7 @@ class Report
   end
   
   def add_slide_with_table(title, description, table_data)
-    slide = Slide.new({:title => title, :description => description})
+    slide = Slide.new({:title => title, :description => description, :slide_type => :table})
     @slides << slide
     add_field("TITLE#{@slides.length}", title)
     add_field("DESCRIPTION#{@slides.length}", description)

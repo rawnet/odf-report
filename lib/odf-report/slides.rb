@@ -15,18 +15,33 @@ module ODFReport
         node_txt.gsub!("draw:page-number=\"#{i+1}\"", "draw:page-number=\"#{i+2}\"")
         node_txt.gsub!("[TITLE#{i+1}]", "[TITLE#{i+2}]")
         node_txt.gsub!("[DESCRIPTION#{i+1}]", "[DESCRIPTION#{i+2}]")
+        
+        node_txt.gsub!("image#{i+1}", "image#{i+2}")
+        node_txt.gsub!("draw:name=\"TABLE#{i+1}\"", "draw:name=\"TABLE#{i+2}\"")
+        
         unless s.image_path.nil?
-          node_txt.gsub!("image#{i+1}", "image#{i+2}")
           node_txt.gsub!(image_href, "Pictures/image#{i+2}#{::File.extname(s.image_path)}")
         end
-        node_txt.gsub!("draw:name=\"TABLE#{i+1}\"", "draw:name=\"TABLE#{i+2}\"")
+        
         slide_node.add_next_sibling(node_txt)
         
         # update slide_node so slides are added in correct order
         slide_node = _node.xpath('//draw:page').last()
       end
-      slide_node
+      
+      # Remove images or tables if not used
+      @slides.slice(0..-1).each_with_index do |s, i|
+        if s.type == :image
+          _node.xpath("//draw:frame[@draw:name='TABLE#{i+1}']").remove
+        elsif s.type == :table
+          _node.xpath("//draw:frame[@draw:name='image#{i+1}']").remove
+        end
+      end
     end
     
   end
 end
+
+
+          
+        
