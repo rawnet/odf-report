@@ -53,8 +53,10 @@ class Image
     end
   end
   
+  # rename image to unique name and return new path
   def replace_image_name node
-    new_image_href = ::File.join(Images::IMAGE_DIR_NAME, ::File.basename(path))
+    image_name = SecureRandom.hex(20)
+    new_image_href = ::File.join(Images::IMAGE_DIR_NAME, image_name)
     node['xlink:href'] = new_image_href
     new_image_href
   end

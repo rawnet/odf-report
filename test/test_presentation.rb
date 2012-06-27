@@ -32,7 +32,7 @@ report = ODFReport::Report.new("test_presentation.odp") do |r|
   
   title = "Test Title 3"
   description = "A description 3"
-  image_path = File.join(Dir.pwd, 'live_view.svg')
+  image_path = File.join(Dir.pwd, 'subfolder/cascade.svg')
   
   r.add_slide_with_image(title, description, image_path, {width: 728, height: 150})
   
