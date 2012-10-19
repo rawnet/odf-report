@@ -5,7 +5,7 @@ class Report
 
   attr_accessor :fields, :tables, :images, :sections, :file, :slides
 
-  def initialize(template_name, &block)
+  def initialize(template_name, single = true, &block)
 
     @file = ODFReport::File.new(template_name)
     
@@ -15,6 +15,7 @@ class Report
     @image_names_replacements = {}
     @sections = []
     @slides = []
+    @single = single
 
     yield(self)
 
@@ -45,6 +46,27 @@ class Report
     opts.merge!(:name => name, :path => path)
     image = Image.new(opts)
     @images << image
+  end
+
+  def add_first_slide(title, description)
+    slide = Slide.new({:title => title, :description => description, :slide_type => :text})
+    @slides << slide
+    add_field("FIRST_TITLE", title)
+    add_field("FIRST_DESCRIPTION", description)
+  end
+
+  def add_last_slide(title, description)
+    slide = Slide.new({:title => title, :description => description, :slide_type => :text})
+    @slides << slide
+    add_field("LAST_TITLE", title)
+    add_field("LAST_DESCRIPTION", description)
+  end
+
+  def add_text_slide(title, description)
+    slide = Slide.new({:title => title, :description => description, :slide_type => :text})
+    @slides << slide
+    add_field("TITLE#{@slides.length}", title)
+    add_field("DESCRIPTION#{@slides.length}", description)
   end
 
   def add_slide_with_image(title, description, image_path, image_options = {})
